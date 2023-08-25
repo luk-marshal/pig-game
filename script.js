@@ -1,55 +1,30 @@
 'use strict';
 
 //Elements
-const dice = {
-  value: 0,
-  img: document.querySelector('.dice'),
-};
+let dice = 0;
+let acumulatedDices = [];
+let acumulatedValue;
+let activePlayer, inactivePlayer;
 
+const diceEl = document.querySelector('.dice');
+const btnNewEl = document.querySelector('.btn--new');
+const btnRollEl = document.querySelector('.btn--roll');
+const btnHoldEl = document.querySelector('.btn--hold');
 const player0El = document.querySelector('.player--0');
 const player1El = document.querySelector('.player--1');
-
 const scorePlayer0El = document.querySelector('#score--0');
 const scorePlayer1El = document.querySelector('#score--1');
-
 const currentPlayer0El = document.querySelector('#current--0');
 const currentPlayer1El = document.querySelector('#current--1');
 
 const diceRoll = function () {
-  dice.value = Math.trunc(Math.random() * 6) + 1;
-  //   console.log(dice.value);
-
-  switch (dice.value) {
-    case 1:
-      dice.img.src = 'dice-1.png';
-      break;
-    case 2:
-      dice.img.src = 'dice-2.png';
-      break;
-    case 3:
-      dice.img.src = 'dice-3.png';
-      break;
-    case 4:
-      dice.img.src = 'dice-4.png';
-      break;
-    case 5:
-      dice.img.src = 'dice-5.png';
-      break;
-    case 6:
-      dice.img.src = 'dice-6.png';
-      break;
-    default:
-      break;
-  }
-  //   console.log(dice.img);
-
-  dice.img.classList.remove('hidden');
+  dice = Math.trunc(Math.random() * 6) + 1;
+  diceEl.src = `dice-${dice}.png`;
+  diceEl.classList.remove('hidden');
+  btnNewEl.classList.remove('hidden');
   upadteAcumulatedValue();
-  return dice.value;
 };
 
-let activePlayer;
-let inactivePlayer;
 const checkActivePlayer = function () {
   if (player0El.classList.contains('player--active')) {
     activePlayer = player0El;
@@ -66,13 +41,12 @@ const checkActivePlayer = function () {
     inactivePlayer.score = scorePlayer0El;
     inactivePlayer.current = currentPlayer0El;
   }
-  return activePlayer;
 };
 
-let acumulatedDices = [];
-let acumulatedValue;
-
 const switchActivePlayer = function (setActive = -1) {
+  acumulatedDices = [];
+  acumulatedValue = 0;
+
   checkActivePlayer();
   if (setActive === 0) {
     player0El.classList.add('player--active');
@@ -86,44 +60,31 @@ const switchActivePlayer = function (setActive = -1) {
   }
   checkActivePlayer();
 
-  acumulatedDices = [];
-  acumulatedValue = 0;
+  activePlayer.current.textContent = 0;
+  inactivePlayer.current.textContent = 0;
 
-  currentPlayer0El.textContent = 0;
-  currentPlayer1El.textContent = 0;
-
-  //   dice.img.classList.add('hidden');
-  dice.img.src = 'dice-1.png';
-
-  return activePlayer;
+  //   diceEl.classList.add('hidden');
+  diceEl.src = 'dice-1.png';
 };
 
 const upadteAcumulatedValue = function () {
-  if (dice.value === 1) {
-    // acumulatedDices = []; TODO:
-    // acumulatedValue = 0;
+  if (dice === 1) {
     switchActivePlayer();
   } else {
-    acumulatedDices.push(dice.value);
-
+    acumulatedDices.push(dice);
     acumulatedValue = acumulatedDices.reduce(
       (accumulator, currentValue) => accumulator + currentValue,
       0
     );
-    console.log(
-      `Current sum: ${acumulatedValue}, Active Player: ${activePlayer.classList[1]}`
-    );
-    console.log(`All dices ${acumulatedDices}`);
-
     activePlayer.current.textContent = acumulatedValue;
   }
-
-  return acumulatedValue;
 };
 
 const gameWon = function () {
-  dice.img.classList.add('hidden');
+  diceEl.classList.add('hidden');
   activePlayer.classList.add('player--winner');
+  btnRollEl.classList.add('hidden');
+  btnHoldEl.classList.add('hidden');
 };
 
 const holdPoints = function () {
@@ -140,26 +101,24 @@ const holdPoints = function () {
 
 //Set initial values
 const newGame = function () {
-  scorePlayer0El.textContent = 0;
-  scorePlayer1El.textContent = 0;
-
-  currentPlayer0El.textContent = 0;
-  currentPlayer0El.textContent = 0;
-
-  acumulatedDices = [];
-  acumulatedValue = 0;
-
   switchActivePlayer(0);
-  player0El.classList.remove('player--winner');
-  player1El.classList.remove('player--winner');
 
-  //TODO: dodać znikanie kostki przy nowej grze i pojawianie się po rzucie
-  //TODO: dodać wygrywanie i zaciemnienie pola wygranej osoby
+  activePlayer.score.textContent = 0;
+  inactivePlayer.score.textContent = 0;
+  activePlayer.current.textContent = 0;
+  inactivePlayer.current.textContent = 0;
+
+  activePlayer.classList.remove('player--winner');
+  // inactivePlayer.classList.remove('player--winner');
+
+  btnNewEl.classList.add('hidden');
+  btnRollEl.classList.remove('hidden');
+  btnHoldEl.classList.remove('hidden');
 };
 
 // Buttons
-document.querySelector('.btn--roll').addEventListener('click', diceRoll);
-document.querySelector('.btn--new').addEventListener('click', newGame);
-document.querySelector('.btn--hold').addEventListener('click', holdPoints);
+btnNewEl.addEventListener('click', newGame);
+btnRollEl.addEventListener('click', diceRoll);
+btnHoldEl.addEventListener('click', holdPoints);
 
 newGame();
