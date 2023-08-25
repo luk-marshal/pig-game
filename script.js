@@ -19,6 +19,7 @@ let dice,
 let accmulatedDices, accmulatedValue;
 
 let activePlayerEl = document.querySelector(`.player--${activePlayer}`);
+let currentActivePlayerEl = document.querySelector(`#current--${activePlayer}`);
 
 const diceRoll = function () {
   dice = Math.trunc(Math.random() * 6) + 1;
@@ -27,10 +28,6 @@ const diceRoll = function () {
   //
   diceEl.classList.remove('hidden');
   btnNewEl.classList.remove('hidden');
-
-  const currentActivePlayerEl = document.querySelector(
-    `#current--${activePlayer}`
-  );
 
   if (dice === 1) {
     currentActivePlayerEl.textContent = 0;
@@ -45,29 +42,17 @@ const diceRoll = function () {
   }
 };
 
-const checkActivePlayer = function () {
-  activePlayer.score = document.querySelector(`#score--${activePlayer}`);
-  activePlayer.current = document.querySelector(`#current--${activePlayer}`);
-};
-
 const switchActivePlayer = function () {
   accmulatedDices = [];
   accmulatedValue = 0;
 
-  if (activePlayer === 1) {
-    player0El.classList.add('player--active');
-    player1El.classList.remove('player--active');
-    currentPlayer1El.textContent = 0;
-  } else if (activePlayer === 0) {
-    player1El.classList.add('player--active');
-    player0El.classList.remove('player--active');
-    currentPlayer0El.textContent = 0;
-  }
+  player0El.classList.toggle('player--active');
+  player1El.classList.toggle('player--active');
+  currentActivePlayerEl.textContent = 0;
 
   activePlayer = activePlayer === 0 ? 1 : 0;
   activePlayerEl = document.querySelector(`.player--${activePlayer}`);
-  //   diceEl.classList.add('hidden');
-  diceEl.src = 'dice-1.png';
+  currentActivePlayerEl = document.querySelector(`#current--${activePlayer}`);
 };
 
 const holdPoints = function () {
@@ -81,6 +66,7 @@ const holdPoints = function () {
   } else {
     switchActivePlayer();
   }
+  diceEl.classList.add('hidden');
 };
 
 //Set initial values
@@ -97,12 +83,12 @@ const newGame = function () {
   currentPlayer1El.textContent = 0;
 
   if (activePlayer != 0) switchActivePlayer();
-  // const activePlayerEl = document.querySelector(`.player--${activePlayer}`);
 
   btnNewEl.classList.add('hidden');
   btnRollEl.classList.remove('hidden');
   btnHoldEl.classList.remove('hidden');
 };
+newGame();
 
 const gameWon = function () {
   diceEl.classList.add('hidden');
@@ -115,5 +101,3 @@ const gameWon = function () {
 btnNewEl.addEventListener('click', newGame);
 btnRollEl.addEventListener('click', diceRoll);
 btnHoldEl.addEventListener('click', holdPoints);
-
-newGame();
